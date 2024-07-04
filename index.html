@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="index.js"></script>
+</head>
+<body>
+    <input type="text" id="nome" placeholder="Nome do partido">
+    <input type="number" id="votos" placeholder="Votos Válidos">
+    <input type="number" id="votosp" placeholder="Votos por partido">
+    <input type="number" id="vagas" placeholder="Quantidade de vagas">
+    <button onclick="Qe()">Enviar</button>
+    <div id="quocienteEleitoral"></div>
+    <div id="quantidadeProporcional"></div>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script defer src="index.js"></script>
+    <title>Cálculo dos Vereadores</title>
+    <style>
+        button{
+        margin-top: 10px;
+        background-color: #0074d9;
+        color: #ffffff;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+        /* Estilos personalizados */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            
+        }
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        /* Alinhar os inputs na mesma linha */
+        input {
+            display: inline-block;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+        /* Restante dos estilos... */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cálculo dos Vereadores</h1>
+    
+        <input type="number" id="votos" placeholder="Votos Válidos">
+        <input type="number" id="vagas" placeholder="Quantidade de vagas">
+        <button onclick="adicionarConjunto()">Adicionar Conjunto</button>
+        <div id="conjuntosContainer"></div>
+        <button onclick="recalcularValores()">Obter Valores</button>
+        <div id="resultadosContainer"></div>
+        <div id="mensagemMaiorResto"></div>
+        <button type="button" onclick="recarregarPagina()">Recarregar</button>
+
+    </div>
+</body>
+</html>
