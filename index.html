@@ -1,65 +1,494 @@
 
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script defer src="index.js"></script>
-    <title>Cálculo dos Vereadores</title>
+    <title>Planejador de Carga - Frota Inteligente (Multimarcas)</title>
     <style>
-        button{
-        margin-top: 10px;
-        background-color: #0074d9;
-        color: #ffffff;
-        border: none;
-        padding: 10px 15px;
-        border-radius: 4px;
-        font-size: 16px;
-        cursor: pointer;
-    }
-        /* Estilos personalizados */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            
-        }
-        h1 {
-            font-size: 24px;
-            color: #333;
-            margin-bottom: 20px;
-        }
-        /* Alinhar os inputs na mesma linha */
-        input {
-            display: inline-block;
-            margin-right: 10px;
-            margin-top: 10px;
-        }
-        /* Restante dos estilos... */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #2c3e50; }
+        h3 { text-align: center; color: #555; margin-bottom: 10px; }
+
+        /* Painel de Caminhão */
+        .painel-frota { background: #eef2f5; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 2px solid #b3c7d6; text-align: center; }
+        .linha-input { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 10px; }
+        .input-placa { font-size: 20px; text-transform: uppercase; font-weight: bold; width: 80px; text-align: center; letter-spacing: 2px; }
+        .btn-acao { background-color: #1f77b4; color: white; border: none; padding: 10px 20px; font-size: 16px; font-weight: bold; border-radius: 4px; cursor: pointer; transition: background 0.3s; }
+        .btn-acao:hover { background-color: #155a8a; }
+        .btn-secundario { background-color: #7f8c8d; }
+        .btn-secundario:hover { background-color: #636e72; }
+
+        #form-cadastro { display: none; margin-top: 20px; padding-top: 20px; border-top: 1px dashed #ccc; }
+        .grid-cadastro { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 15px; }
+        .grid-cadastro div { display: flex; flex-direction: column; align-items: center; }
+        
+        #area-calculo { display: none; }
+
+        /* Controles de Carga */
+        .controles { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #ddd; }
+        .input-group { display: flex; flex-direction: column; align-items: center; }
+        label { font-weight: bold; margin-bottom: 5px; font-size: 14px; text-align: center;}
+        input[type="number"] { width: 70px; padding: 8px; text-align: center; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; }
+        
+        /* Box de Ordem de Descarga */
+        .ordem-descarga { width: 100%; text-align: center; margin-top: 10px; margin-bottom: 15px; padding: 10px; background: #fdfdfd; border: 1px dashed #ccc; border-radius: 4px; }
+        .radio-group { display: flex; justify-content: center; gap: 20px; margin-top: 8px; font-size: 16px; font-weight: bold; }
+
+        /* Alertas */
+        #resumo { text-align: center; font-size: 16px; margin-bottom: 20px; padding: 15px; border-radius: 4px; display: none; font-weight: bold; }
+        .alerta-ok { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alerta-erro { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        /* Grids */
+        .secao { margin-bottom: 40px; padding-bottom: 20px; border-bottom: 2px dashed #eee; }
+        .carroceria-wrapper { overflow-x: auto; padding-bottom: 10px; }
+        .grid-dinamico { display: grid; gap: 4px; margin-top: 10px; }
+        .grid-centralizado { display: grid; gap: 4px; margin-top: 10px; max-width: 450px; margin-left: auto; margin-right: auto; }
+        
+        .celula { height: 40px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; border-radius: 4px; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+        .celula-acumulado { text-align: center; font-weight: bold; color: #1f77b4; font-size: 14px; padding-top: 8px; border-top: 2px dashed #ccc; }
+
+        /* Cores */
+        .bg-P13L { background-color: #27ae60; color: white; } /* Verde Liquigás */
+        .bg-P13C { background-color: #1f77b4; color: white; } /* Azul Copagaz */
+        .bg-P45  { background-color: #d62728; color: white; }
+        .bg-P20  { background-color: #ff7f0e; color: black; text-shadow: none; }
+        .bg-P8   { background-color: #bcbd22; color: black; text-shadow: none; }
+        .bg-P5   { background-color: #9467bd; color: white; }
+        .bg-vazio { background-color: #f9f9f9; border: 1px dashed #ccc; }
+
+        /* Gráfico de Peso */
+        .grid-peso { display: grid; gap: 4px; height: 120px; align-items: end; margin-top: 20px; }
+        .barra-container { display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; width: 100%; }
+        .barra-peso { width: 100%; background-color: #555; border-radius: 3px 3px 0 0; }
+        .label-peso { font-size: 10px; font-weight: bold; margin-bottom: 4px; color: #333; }
+
+        /* Legenda */
+        .legenda { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-top: 10px; padding: 20px; background: #fff; position: sticky; bottom: 0; border-top: 1px solid #ddd; }
+        .item-legenda { display: flex; align-items: center; gap: 5px; font-weight: bold; font-size: 14px;}
+        .cor-box { width: 20px; height: 20px; border-radius: 3px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Cálculo dos Vereadores</h1>
-    
-        <input type="number" id="votos" placeholder="Votos Válidos">
-        <input type="number" id="vagas" placeholder="Quantidade de vagas">
-        <button onclick="adicionarConjunto()">Adicionar Conjunto</button>
-        <div id="conjuntosContainer"></div>
-        <button onclick="recalcularValores()">Obter Valores</button>
-        <div id="resultadosContainer"></div>
-        <div id="mensagemMaiorResto"></div>
-        <button type="button" onclick="recarregarPagina()">Recarregar</button>
 
+<div class="container">
+    <h1>🚛 Planeador de Carga e Frota</h1>
+
+    <div class="painel-frota" id="painel-frota">
+        <h3>Identificação do Camião</h3>
+        <p>Digite as 3 primeiras letras da matrícula:</p>
+        <div class="linha-input">
+            <input type="text" id="placa_busca" class="input-placa" maxlength="3" placeholder="QRF">
+            <button class="btn-acao" onclick="buscarCaminhao()">Confirmar Matrícula</button>
+        </div>
+        
+        <div id="msg-frota" style="margin-top: 15px; font-weight: bold; color: #d62728;"></div>
+
+        <div id="form-cadastro">
+            <h3 style="color: #1f77b4;">Cadastrar Novo Camião</h3>
+            <div class="grid-cadastro">
+                <div>
+                    <label>Matrícula (3 letras)</label>
+                    <input type="text" id="cad_placa" class="input-placa" maxlength="3" disabled>
+                </div>
+                <div>
+                    <label>Carga Máx. (Qtd Total P13)</label>
+                    <input type="number" id="cad_limite" placeholder="Ex: 477">
+                </div>
+                <div>
+                    <label>Comprimento (Fileiras)</label>
+                    <input type="number" id="cad_cols" placeholder="Ex: 22">
+                </div>
+                <div>
+                    <label>Largura (Botijas)</label>
+                    <input type="number" id="cad_rows" placeholder="Ex: 6">
+                </div>
+            </div>
+            <button class="btn-acao btn-secundario" onclick="salvarCaminhao()">Salvar na Frota</button>
+            <button class="btn-acao" style="background-color: #e74c3c;" onclick="fecharCadastro()">Cancelar</button>
+        </div>
     </div>
+
+    <div id="area-calculo">
+        <div style="text-align: center; margin-bottom: 15px;">
+            <h2 id="titulo-caminhao-ativo" style="color: #1f77b4; margin: 0;"></h2>
+            <button onclick="trocarCaminhao()" style="background: none; border: none; color: #7f8c8d; text-decoration: underline; cursor: pointer;">Trocar Camião</button>
+        </div>
+
+        <div class="controles">
+            <div class="input-group" style="border-right: 2px dashed #ccc; padding-right: 15px;">
+                <label style="color: #27ae60;">P13 Liquigás</label>
+                <input type="number" id="qtd_p13_liq" value="0" min="0">
+            </div>
+            <div class="input-group" style="border-right: 2px dashed #ccc; padding-right: 15px;">
+                <label style="color: #1f77b4;">P13 Copagaz</label>
+                <input type="number" id="qtd_p13_cop" value="0" min="0">
+            </div>
+            
+            <div class="input-group"><label>P45</label><input type="number" id="qtd_p45" value="0" min="0"></div>
+            <div class="input-group"><label>P20</label><input type="number" id="qtd_p20" value="0" min="0"></div>
+            <div class="input-group"><label>P8</label><input type="number" id="qtd_p8" value="0" min="0"></div>
+            <div class="input-group"><label>P5</label><input type="number" id="qtd_p5" value="0" min="0"></div>
+            
+            <div class="ordem-descarga">
+                <label style="color: #333;">🚚 Qual marca será descarregada <b>PRIMEIRO</b>? (Ficará nas portas)</label>
+                <div class="radio-group">
+                    <div>
+                        <input type="radio" id="desc_liq" name="desc_primeiro" value="L" checked>
+                        <label for="desc_liq" style="color: #27ae60; cursor: pointer;">Liquigás</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="desc_cop" name="desc_primeiro" value="C">
+                        <label for="desc_cop" style="color: #1f77b4; cursor: pointer;">Copagaz</label>
+                    </div>
+                </div>
+            </div>
+
+            <div style="width: 100%; display: flex; gap: 10px;">
+                <button class="btn-acao" style="flex: 2;" onclick="gerarMapa()">Calcular e Gerar Mapas</button>
+                <button class="btn-acao btn-secundario" style="flex: 1;" onclick="window.print()">🖨️ Imprimir / PDF</button>
+            </div>
+        </div>
+
+        <div id="resumo"></div>
+
+        <div class="secao" id="secao_superior" style="display: none;">
+            <h3>1. VISTA SUPERIOR (MAPA DE DOCA)</h3>
+            <div style="display: flex; justify-content: space-between; font-weight: bold; color: #777; margin-bottom: 5px;">
+                <span>⬅️ CABINE (Início)</span>
+                <span>PORTAS (Fundo) ➡️</span>
+            </div>
+            <div class="carroceria-wrapper">
+                <div class="grid-dinamico" id="grid_mapa"></div>
+                <div class="grid-dinamico" id="grid_acumulado" style="margin-top: 10px;"></div>
+                <div style="text-align: center; color: #1f77b4; font-weight: bold; margin-top: 5px; font-size: 12px;">SOMA ACUMULADA FÍSICA PARA CONFERÊNCIA</div>
+            </div>
+        </div>
+
+        <div class="secao" id="secao_esq" style="display: none;">
+            <h3>2. VISTA LATERAL ESQUERDA (Altura)</h3>
+            <div class="carroceria-wrapper"><div class="grid-dinamico" id="grid_lat_esq"></div></div>
+        </div>
+
+        <div class="secao" id="secao_dir" style="display: none;">
+            <h3>3. VISTA LATERAL DIREITA (Altura)</h3>
+            <div class="carroceria-wrapper"><div class="grid-dinamico" id="grid_lat_dir"></div></div>
+        </div>
+
+        <div class="secao" id="secao_tras" style="display: none;">
+            <h3 style="color: #d62728;">4. VISTA DA ENTRADA (Portas abertas)</h3>
+            <div style="display: flex; justify-content: space-between; max-width: 450px; margin: 0 auto; font-weight: bold; color: #555; font-size: 12px;">
+                <span>LADO ESQUERDO</span><span>LADO DIREITO</span>
+            </div>
+            <div class="carroceria-wrapper"><div class="grid-centralizado" id="grid_traseira"></div></div>
+        </div>
+
+        <div class="secao" id="secao_peso" style="border-bottom: none; display: none;">
+            <h3>5. DISTRIBUIÇÃO DE PESO BRUTO POR COLUNA (kg)</h3>
+            <div class="carroceria-wrapper"><div class="grid-peso" id="grid_peso"></div></div>
+        </div>
+
+        <div class="legenda">
+            <div class="item-legenda"><div class="cor-box bg-P13L"></div> P13 Liquigás</div>
+            <div class="item-legenda"><div class="cor-box bg-P13C"></div> P13 Copagaz</div>
+            <div class="item-legenda"><div class="cor-box bg-P45"></div> P45</div>
+            <div class="item-legenda"><div class="cor-box bg-P20"></div> P20</div>
+            <div class="item-legenda"><div class="cor-box bg-P8"></div> P8</div>
+            <div class="item-legenda"><div class="cor-box bg-P5"></div> P5</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const peso_liquido_p13 = 13;
+    const peso_bruto = { 'P13L': 28, 'P13C': 28, 'P45': 80, 'P20': 41, 'P8': 18, 'P5': 12 };
+    const fator_conversao = { 'P13L': 1.0, 'P13C': 1.0, 'P45': 3.0, 'P20': 2.0, 'P8': 0.8524, 'P5': 0.6723 };
+    
+    let cols = 0;
+    let rows = 0;
+    let limite_liquido = 0;
+    const max_altura = 4;
+
+    let frota = JSON.parse(localStorage.getItem('frota_caminhoes')) || {
+        "QRF": { placa: "QRF", cols: 22, rows: 6, max_p13: 477 }
+    };
+
+    function salvarFrota() {
+        localStorage.setItem('frota_caminhoes', JSON.stringify(frota));
+    }
+
+    function buscarCaminhao() {
+        let placa = document.getElementById('placa_busca').value.trim().toUpperCase();
+        let msgBox = document.getElementById('msg-frota');
+        
+        if(placa.length < 3) {
+            msgBox.innerText = "Por favor, digite 3 caracteres da matrícula.";
+            return;
+        }
+
+        if (frota[placa]) {
+            ativarCaminhao(placa);
+        } else {
+            msgBox.innerText = `Matrícula "${placa}" não encontrada. Cadastre este camião abaixo:`;
+            document.getElementById('cad_placa').value = placa;
+            document.getElementById('form-cadastro').style.display = 'block';
+        }
+    }
+
+    function salvarCaminhao() {
+        let placa = document.getElementById('cad_placa').value;
+        let max_p13 = parseInt(document.getElementById('cad_limite').value);
+        let c_cols = parseInt(document.getElementById('cad_cols').value);
+        let c_rows = parseInt(document.getElementById('cad_rows').value);
+
+        if(!max_p13 || !c_cols || !c_rows) {
+            alert("Preencha todos os campos do camião!");
+            return;
+        }
+
+        frota[placa] = { placa: placa, cols: c_cols, rows: c_rows, max_p13: max_p13 };
+        salvarFrota(); 
+        
+        alert(`Camião ${placa} cadastrado com sucesso!`);
+        fecharCadastro();
+        ativarCaminhao(placa);
+    }
+
+    function fecharCadastro() {
+        document.getElementById('form-cadastro').style.display = 'none';
+        document.getElementById('msg-frota').innerText = '';
+    }
+
+    function ativarCaminhao(placa) {
+        let caminhao = frota[placa];
+        cols = caminhao.cols;
+        rows = caminhao.rows;
+        limite_liquido = caminhao.max_p13 * 13; 
+
+        document.getElementById('painel-frota').style.display = 'none';
+        document.getElementById('area-calculo').style.display = 'block';
+        document.getElementById('titulo-caminhao-ativo').innerText = `Camião Ativo: Matrícula [${placa}] (${cols}x${rows})`;
+        
+        document.getElementById('qtd_p13_liq').value = caminhao.max_p13;
+        document.getElementById('qtd_p13_cop').value = 0;
+
+        document.getElementById('secao_superior').style.display = 'none';
+        document.getElementById('secao_esq').style.display = 'none';
+        document.getElementById('secao_dir').style.display = 'none';
+        document.getElementById('secao_tras').style.display = 'none';
+        document.getElementById('secao_peso').style.display = 'none';
+        document.getElementById('resumo').style.display = 'none';
+    }
+
+    function trocarCaminhao() {
+        document.getElementById('area-calculo').style.display = 'none';
+        document.getElementById('painel-frota').style.display = 'block';
+        document.getElementById('placa_busca').value = '';
+        document.getElementById('msg-frota').innerText = '';
+    }
+
+    function gerarMapa() {
+        let p13_liq = parseInt(document.getElementById('qtd_p13_liq').value) || 0;
+        let p13_cop = parseInt(document.getElementById('qtd_p13_cop').value) || 0;
+        let p45 = parseInt(document.getElementById('qtd_p45').value) || 0;
+        let p20 = parseInt(document.getElementById('qtd_p20').value) || 0;
+        let p8  = parseInt(document.getElementById('qtd_p8').value) || 0;
+        let p5  = parseInt(document.getElementById('qtd_p5').value) || 0;
+        
+        // Verifica qual sai primeiro
+        let primeiro_descarregar = document.querySelector('input[name="desc_primeiro"]:checked').value;
+
+        let eq_exato = (p13_liq * fator_conversao.P13L) + (p13_cop * fator_conversao.P13C) + 
+                       (p45 * fator_conversao.P45) + (p20 * fator_conversao.P20) + 
+                       (p8 * fator_conversao.P8) + (p5 * fator_conversao.P5);
+                       
+        let eq_arredondado = Math.ceil(eq_exato);
+        let carga_liquida = eq_arredondado * peso_liquido_p13;
+
+        let resumoDiv = document.getElementById('resumo');
+        resumoDiv.style.display = 'block';
+        if (carga_liquida > limite_liquido) {
+            let excesso = (carga_liquida - limite_liquido).toFixed(2);
+            resumoDiv.className = 'alerta-erro';
+            resumoDiv.innerHTML = `⚠️ ALERTA DE EXCESSO! Passou ${excesso} kg.<br>Carga Total: ${carga_liquida.toFixed(2)} kg | Limite do Camião: ${limite_liquido} kg`;
+        } else {
+            resumoDiv.className = 'alerta-ok';
+            resumoDiv.innerHTML = `✅ Peso Autorizado.<br>Carga Total: ${carga_liquida.toFixed(2)} kg (Limite: ${limite_liquido} kg) | Eqv: ${eq_arredondado} P13`;
+        }
+
+        let grid = Array.from({length: rows}, () => Array.from({length: cols}, () => []));
+        let p13l_left = p13_liq, p13c_left = p13_cop, p45_left = p45, p20_left = p20, p8_left = p8, p5_left = p5;
+
+        for (let c = 0; c < cols; c++) {
+            for (let r = 0; r < rows; r++) {
+                let max_h = (c < 3 || c >= cols - 3) ? 3 : 4;
+                
+                let p13_total_left = p13l_left + p13c_left;
+
+                if (p13_total_left > 0) {
+                    let take_p13 = Math.min(p13_total_left, max_h);
+                    let space_left = max_h - take_p13;
+                    
+                    let pushed = 0;
+                    while(pushed < take_p13) {
+                        if (primeiro_descarregar === 'L') {
+                            // Se a Liquigás descarrega primeiro, ela vai para as portas (final do loop).
+                            // Então preenchemos a Copagaz primeiro (perto da cabine).
+                            if(p13c_left > 0) { grid[r][c].push('P13C'); p13c_left--; }
+                            else if(p13l_left > 0) { grid[r][c].push('P13L'); p13l_left--; }
+                        } else {
+                            // Se a Copagaz descarrega primeiro, preenchemos a Liquigás na cabine.
+                            if(p13l_left > 0) { grid[r][c].push('P13L'); p13l_left--; }
+                            else if(p13c_left > 0) { grid[r][c].push('P13C'); p13c_left--; }
+                        }
+                        pushed++;
+                    }
+
+                    if (space_left > 0 && p8_left > 0) {
+                        let take_p8 = Math.min(p8_left, space_left);
+                        for(let i=0; i<take_p8; i++) grid[r][c].push('P8');
+                        p8_left -= take_p8;
+                    } else if (space_left > 0 && p5_left > 0) {
+                        let take_p5 = Math.min(p5_left, space_left);
+                        for(let i=0; i<take_p5; i++) grid[r][c].push('P5');
+                        p5_left -= take_p5;
+                    }
+                    continue;
+                }
+                if (p8_left > 0) {
+                    let take = Math.min(p8_left, max_h);
+                    for(let i=0; i<take; i++) grid[r][c].push('P8');
+                    p8_left -= take; continue;
+                }
+                if (p5_left > 0) {
+                    let take = Math.min(p5_left, max_h);
+                    for(let i=0; i<take; i++) grid[r][c].push('P5');
+                    p5_left -= take; continue;
+                }
+                if (p45_left > 0) {
+                    grid[r][c].push('P45');
+                    p45_left -= 1; continue;
+                }
+                if (p20_left > 0) {
+                    grid[r][c].push('P20');
+                    p20_left -= 1; continue;
+                }
+            }
+        }
+
+        document.getElementById('secao_superior').style.display = 'block';
+        document.getElementById('secao_esq').style.display = 'block';
+        document.getElementById('secao_dir').style.display = 'block';
+        document.getElementById('secao_tras').style.display = 'block';
+        document.getElementById('secao_peso').style.display = 'block';
+
+        function criarCelula(item, pilha) {
+            let div = document.createElement('div');
+            div.classList.add('celula');
+            
+            if (!item) {
+                div.classList.add('bg-vazio');
+            } else {
+                div.classList.add('bg-' + item); 
+                
+                let num_p13 = pilha.filter(x => x === 'P13L' || x === 'P13C').length;
+                let top_item = pilha[pilha.length - 1];
+                let texto = pilha.length;
+
+                if ((top_item === 'P8' || top_item === 'P5') && num_p13 > 0) {
+                    texto = `${num_p13}+${pilha.filter(x => x === top_item).length}`;
+                }
+
+                div.innerText = texto;
+            }
+            return div;
+        }
+
+        const estiloColuna = `repeat(${cols}, minmax(30px, 1fr))`;
+        const estiloLinha = `repeat(${rows}, minmax(50px, 1fr))`;
+
+        const gridMapa = document.getElementById('grid_mapa');
+        gridMapa.style.gridTemplateColumns = estiloColuna;
+        gridMapa.innerHTML = ''; 
+
+        for (let r = rows - 1; r >= 0; r--) {
+            for (let c = 0; c < cols; c++) {
+                let pilha = grid[r][c];
+                let top_item = pilha.length > 0 ? pilha[pilha.length - 1] : null;
+                gridMapa.appendChild(criarCelula(top_item, pilha));
+            }
+        }
+
+        const gridAcumulado = document.getElementById('grid_acumulado');
+        gridAcumulado.style.gridTemplateColumns = estiloColuna;
+        gridAcumulado.innerHTML = '';
+        let contagemAcumulada = 0;
+        let pesosColunas = [];
+
+        for (let c = 0; c < cols; c++) {
+            let botijoes_na_coluna = 0; let peso_na_coluna = 0;
+            for (let r = 0; r < rows; r++) {
+                botijoes_na_coluna += grid[r][c].length;
+                grid[r][c].forEach(b => peso_na_coluna += peso_bruto[b]);
+            }
+            contagemAcumulada += botijoes_na_coluna;
+            pesosColunas.push(peso_na_coluna);
+            
+            let divNum = document.createElement('div');
+            divNum.classList.add('celula-acumulado');
+            divNum.innerText = contagemAcumulada > 0 ? contagemAcumulada : '-';
+            gridAcumulado.appendChild(divNum);
+        }
+
+        const gridLatEsq = document.getElementById('grid_lat_esq');
+        gridLatEsq.style.gridTemplateColumns = estiloColuna;
+        gridLatEsq.innerHTML = '';
+        for (let h = max_altura - 1; h >= 0; h--) {
+            for (let c = 0; c < cols; c++) {
+                let pilha = grid[rows - 1][c];
+                let item = pilha.length > h ? pilha[h] : null;
+                gridLatEsq.appendChild(criarCelula(item, pilha));
+            }
+        }
+
+        const gridLatDir = document.getElementById('grid_lat_dir');
+        gridLatDir.style.gridTemplateColumns = estiloColuna;
+        gridLatDir.innerHTML = '';
+        for (let h = max_altura - 1; h >= 0; h--) {
+            for (let c = 0; c < cols; c++) {
+                let pilha = grid[0][c];
+                let item = pilha.length > h ? pilha[h] : null;
+                gridLatDir.appendChild(criarCelula(item, pilha));
+            }
+        }
+
+        const gridTraseira = document.getElementById('grid_traseira');
+        gridTraseira.style.gridTemplateColumns = estiloLinha;
+        gridTraseira.innerHTML = '';
+        for (let h = max_altura - 1; h >= 0; h--) {
+            for (let r = rows - 1; r >= 0; r--) {
+                let pilha = grid[r][cols - 1];
+                let item = pilha.length > h ? pilha[h] : null;
+                gridTraseira.appendChild(criarCelula(item, pilha));
+            }
+        }
+
+        const gridPeso = document.getElementById('grid_peso');
+        gridPeso.style.gridTemplateColumns = estiloColuna;
+        gridPeso.innerHTML = '';
+        let maxPeso = Math.max(...pesosColunas, 1);
+
+        pesosColunas.forEach(peso => {
+            let container = document.createElement('div');
+            container.className = 'barra-container';
+            let label = document.createElement('div'); label.className = 'label-peso'; label.innerText = peso > 0 ? peso + 'kg' : '';
+            let bar = document.createElement('div'); bar.className = 'barra-peso'; bar.style.height = ((peso / maxPeso) * 100) + '%';
+            container.appendChild(label); container.appendChild(bar); gridPeso.appendChild(container);
+        });
+    }
+</script>
+
 </body>
 </html>
