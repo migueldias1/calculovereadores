@@ -1,0 +1,65 @@
+body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 20px; }
+.container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+h1, h3 { text-align: center; color: #2c3e50; }
+
+/* Painéis */
+.painel-frota { background: #eef2f5; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 2px solid #b3c7d6; text-align: center; }
+.linha-input { display: flex; justify-content: center; gap: 10px; margin-top: 10px; }
+.input-placa { font-size: 20px; text-transform: uppercase; font-weight: bold; width: 85px; text-align: center; }
+.mensagem-erro { margin-top: 15px; font-weight: bold; color: #d62728; }
+
+/* Botões */
+.btn-acao { background-color: #1f77b4; color: white; border: none; padding: 12px; font-weight: bold; border-radius: 4px; cursor: pointer; }
+.btn-secundario { background-color: #7f8c8d; }
+.btn-cancelar { background-color: #e74c3c; }
+.flex-1 { flex: 1; } .flex-2 { flex: 2; }
+.botoes-container { width: 100%; display: flex; gap: 10px; margin-top: 15px; }
+
+/* Controles */
+.controles { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #ddd; }
+.input-group { display: flex; flex-direction: column; align-items: center; padding: 5px; }
+.input-group input { width: 70px; padding: 8px; text-align: center; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; }
+.border-green { border-right: 2px dashed #27ae60; padding-right: 15px; }
+.border-blue { border-right: 2px dashed #1f77b4; padding-right: 15px; }
+.label-liq { color: #27ae60; font-weight: bold; }
+.label-cop { color: #1f77b4; font-weight: bold; }
+
+.ordem-descarga { width: 100%; text-align: center; background: #f9f9f9; padding: 10px; border-radius: 5px; margin-top: 10px; }
+.radio-group { display: flex; justify-content: center; gap: 20px; margin-top: 8px; }
+
+/* Grids e Mapas */
+.secao { margin-bottom: 40px; border-bottom: 2px dashed #eee; padding-bottom: 20px; }
+.carroceria-wrapper { overflow-x: auto; padding-bottom: 10px; }
+.grid-dinamico { display: grid; gap: 4px; margin-top: 10px; }
+.grid-centralizado { display: grid; gap: 4px; margin-top: 10px; max-width: 450px; margin-left: auto; margin-right: auto; }
+.fluxo-indicador { display: flex; justify-content: space-between; font-weight: bold; color: #777; font-size: 12px; }
+
+.celula { height: 40px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; border-radius: 4px; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.4); }
+.bg-vazio { background-color: #f9f9f9; border: 1px dashed #ccc; }
+.celula-acumulado { text-align: center; font-weight: bold; color: #1f77b4; font-size: 13px; margin-top: 8px; border-top: 1px solid #ccc; }
+.conferencia-txt { text-align: center; color: #1f77b4; font-size: 11px; font-weight: bold; margin-top: 5px; }
+
+/* Cores das Botijas */
+.bg-P13L { background-color: #27ae60; }
+.bg-P13C { background-color: #1f77b4; }
+.bg-P45  { background-color: #d62728; }
+.bg-P20  { background-color: #ff7f0e; color: #000; text-shadow: none; }
+.bg-P8   { background-color: #bcbd22; color: #000; text-shadow: none; }
+.bg-P5   { background-color: #9467bd; }
+
+/* Gráfico de Peso */
+.grid-peso { display: grid; gap: 4px; height: 100px; align-items: end; }
+.barra-container { display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; }
+.barra-peso { width: 100%; background: #555; border-radius: 2px 2px 0 0; }
+.label-peso { font-size: 9px; font-weight: bold; margin-bottom: 2px; }
+
+/* Legenda e Ajustes de Impressão */
+.legenda { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-top: 20px; padding: 15px; background: white; border-top: 1px solid #ddd; }
+.item-legenda { display: flex; align-items: center; gap: 5px; font-weight: bold; font-size: 13px; }
+.cor-box { width: 18px; height: 18px; border-radius: 3px; }
+
+@media print {
+    .painel-frota, .controles, .link-trocar, .btn-acao { display: none !important; }
+    body { padding: 0; }
+    .container { box-shadow: none; }
+}
